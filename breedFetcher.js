@@ -1,10 +1,22 @@
 const request = require('request');
-const name = process.argv[2];
-const api = `https://api.thecatapi.com/v1/breeds/search?q=${name}`;
 
-request(api, (err, response, body) => {
-  if (err) return console.log(`Error: Incorrect url ${api}`);
-  let bodyJson = JSON.parse(body);
-  if (bodyJson.length === 0) return console.log("Cat breed not found");
-  console.log(bodyJson);
-});
+const fetchBreedDescription = (name, callback) => {
+  const api = `https://api.thecatapi.com/v1/breeds/search?q=${name}`;
+  
+  request(api, (err, response, body) => {
+    if (err) {
+      callback(`Error: Incorrect url ${api}`);
+      return;
+    }
+
+    let description = JSON.parse(body)[0].description;
+    
+    if (! description) {
+      callback("Cat breed not found");
+      return;
+    } else callback(null, description);
+
+  });
+};
+
+module.exports = {fetchBreedDescription};
